@@ -1,26 +1,57 @@
 #include <Servo.h>
 
+const int servoPin = 9;
+const int redLedPin = 11;
+const int greenLedPin = 12;
+const int commandLedPin = 13;
+
 Servo servo;
 
 void setup() {
   Serial.begin(9600);  
-  servo.attach(9);
-  pinMode(13, OUTPUT);
-    Serial.write("started");
+  servo.attach(servoPin);
+  pinMode(redLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
+  pinMode(commandLedPin, OUTPUT);
+  testLeds();
 }
 
-void loop() {
+void testLeds() {
+  digitalWrite(redLedPin, HIGH);   
+  digitalWrite(greenLedPin, HIGH);   
+  digitalWrite(commandLedPin, HIGH); 
+  delay(100);   
+  digitalWrite(redLedPin, LOW);   
+  digitalWrite(greenLedPin, LOW);   
+  digitalWrite(commandLedPin, LOW); 
+  delay(100); 
+}
+
+void loop() {  
    if (Serial.available() > 0) {
-      int pos = Serial.read();
+      byte bt = Serial.read();
       delay(2);
       
-      servo.write(pos);   
-      pos = 10;
-      Serial.write(pos);
+      if (bt == 0) {
+        int angle = Serial.read();
+        servo.write(angle); 
+      } else {
+        int state = bt & 0x7f;
+        
+        if (state == 0 || state == 3)
+          digitalWrite(greenLedPin, LOW);
+        else
+          digitalWrite(greenLedPin, HIGH);
+        
+        if (state == 0 || state == 2)
+          digitalWrite(redLedPin, LOW);
+        else
+          digitalWrite(redLedPin, HIGH);
+      }
       
-      digitalWrite(13, HIGH);   
+      digitalWrite(commandLedPin, HIGH);   
       delay(100);             
-      digitalWrite(13, LOW); 
+      digitalWrite(commandLedPin, LOW); 
       delay(100); 
    } 
 }
