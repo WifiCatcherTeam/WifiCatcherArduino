@@ -14,6 +14,8 @@ void setup() {
   pinMode(greenLedPin, OUTPUT);
   pinMode(commandLedPin, OUTPUT);
   testLeds();
+  
+  Serial.write("start");
 }
 
 void testLeds() {
@@ -36,7 +38,7 @@ void loop() {
         int angle = Serial.read();
         servo.write(angle); 
       } else {
-        int state = bt & 0x7f;
+        int state = Serial.read();
         
         if (state == 0 || state == 3)
           digitalWrite(greenLedPin, LOW);
